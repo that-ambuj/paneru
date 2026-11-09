@@ -54,6 +54,10 @@ impl DisplayReconcileState {
     pub(crate) fn is_settling(&self) -> bool {
         self.pending.is_some() && self.verify_again
     }
+
+    pub(crate) fn is_idle(&self) -> bool {
+        self.pending.is_none()
+    }
 }
 
 pub struct DisplayEventsPlugin;
@@ -258,6 +262,8 @@ pub(crate) fn reconcile_displays(
         // requiring a second notification from Core Graphics.
         state.verify_again = false;
         state.pending = Some(Timer::new(DISPLAY_VERIFY_DELAY, TimerMode::Once));
+    } else {
+        commands.trigger(crate::ecs::setups::DisplaysSettled);
     }
 }
 
